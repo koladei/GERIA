@@ -1,6 +1,6 @@
 import { InferSchemaType, Schema, model } from "mongoose";
 
-const historySchema = new Schema(
+const calcSchema = new Schema(
   {
     param1: { type: Number, require: true },
     param2: { type: Number, require: true },
@@ -10,6 +10,6 @@ const historySchema = new Schema(
   { timestamps: true }
 );
 
-type Calc = InferSchemaType<typeof historySchema>;
+type Calc = InferSchemaType<typeof calcSchema>;
 
-export default model<Calc>("Calc", historySchema);
+export default model<Calc>("Calc", calcSchema);
