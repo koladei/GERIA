@@ -11,6 +11,15 @@ export const getHistory: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const clearHistory: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await CalcModel.deleteMany().exec();
+    res.status(200).json({ result, history: [] });
+  } catch (error) {
+    next(error);
+  }
+};
+
 interface IOperationParameters {
   param1: number;
   param2: number;

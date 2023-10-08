@@ -11,9 +11,9 @@
   --header-height: 100px;
 
   .Content {
+    @extend .shadow-lg;
     display: flex;
     flex-direction: column;
-    box-shadow: 1px 3px 20px 5px #454545;
     border-radius: 20px;
     padding: 10px;
     overflow: hidden;
@@ -64,6 +64,10 @@
       justify-content: flex-end;
       padding: 3px;
       cursor: pointer;
+      .btn {
+        @extend .shadow;
+        max-width: 60px;
+      }
     }
 
     .Body {
@@ -88,7 +92,6 @@
           justify-content: space-around;
           padding: 10px;
           cursor: pointer;
-          border: 1px solid #cdccdd;
           * {
             flex-grow: 0;
             flex-shrink: 0;

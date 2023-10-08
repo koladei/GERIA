@@ -2,14 +2,24 @@ import { useEffect, useState } from 'react'
 import styles from './App.module.scss'
 import Calculator from '../Calculator/Calculator';
 import { IOperationDescription } from '../../models/interfaces';
-import { BsClockHistory, BsFillCalculatorFill } from "react-icons/bs"
+import { Modal, ModalBody, ModalHeader, ModalFooter } from "reactstrap";
+import { BsClockHistory, BsFillCalculatorFill } from "react-icons/bs";
+import { AiOutlineClear } from "react-icons/ai"
 import { operationsInverse } from '../../util/constants';
+import classNames from 'classnames';
 
 function App() {
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<IOperationDescription[]>([]);
   const [loading, setLoading] = useState(false);
   const [currentOperation, setCurrentOperation] = useState<IOperationDescription>({});
+  const [calcToggleTitle, setCalcToggleTitle] = useState("");
+  const [toggleClearHistoryModal, setToggleClearHistoryModal] = useState(false);
+
+  useEffect(() => {
+    if (showHistory) setCalcToggleTitle("Click to return to calculator");
+    if (!showHistory) setCalcToggleTitle("Click to view calculation history");
+  }, [showHistory]);
 
   useEffect(() => {
     const getHistory = async () => {
@@ -20,14 +30,25 @@ function App() {
 
     setLoading(true);
     getHistory().then((his) => {
-      setHistory(his.map((val: IOperationDescription) => {
-        val.operator = operationsInverse[val.operator || ""]
-        return val;
-      }))
+      setHistory(mapHistory(his))
     }).finally(() => {
       setLoading(false)
     });
   }, []);
+
+  const mapHistory = (his: IOperationDescription[]) => {
+    return his.map((val) => {
+      val.operator = operationsInverse[val.operator || ""]
+      return val;
+    })
+  }
+
+  const clearHistory = async () => {
+    const f = await fetch("/api/calc/history/clear");
+    const deleteOps = await f.json();
+
+    setHistory(mapHistory(deleteOps.history));
+  }
 
   return (
     <div className={styles.App}>
@@ -36,30 +57,51 @@ function App() {
           <div className={styles.Logo} style={{ backgroundImage: `url('logo.png')` }} />
           <div className={styles.Title}>REST Calculator App</div>
         </div>
-        <div className={styles.Controls} title={showHistory ? "Click to return to calculator" : "Click to view calculation history"} onClick={() => {
-          setShowHistory(!showHistory);
-        }}>
-          {
-            !showHistory &&
-            <BsClockHistory size="30" />
-          }
 
-          {
-            showHistory &&
-            <BsFillCalculatorFill size="30" />
-          }
-        </div>
+        {
+          !showHistory && <div className={classNames(styles.Controls, styles["btn-group"])} title={calcToggleTitle} >
+            <button className={classNames(styles.btn, styles["btn-warning"], styles["btn-sm"])} onClick={() => {
+              setShowHistory(!showHistory);
+            }}>
+              <BsClockHistory size="20" />
+            </button>
+          </div>
+        }
+
+        {/* when the history is visible */}
+        {
+          showHistory &&
+          <div className={classNames(styles.Controls, styles["btn-group"], styles["btn-group-sm"])} title={calcToggleTitle}>
+            <button className={classNames(styles.btn, styles["btn-danger"], styles["btn-sm"])} disabled={!(history?.length > 0)} onClick={() => {
+              setToggleClearHistoryModal(true);
+            }}>
+              <AiOutlineClear size="20" />
+            </button>
+            <button className={classNames(styles.btn, styles["btn-warning"], styles["btn-sm"])} onClick={() => {
+              setShowHistory(!showHistory);
+            }}>
+              <BsFillCalculatorFill size="20" />
+            </button>
+          </div>
+        }
         <div className={styles.Body}>
           {
             showHistory &&
-            <ul className={styles.History}>
-              {history.map((his: IOperationDescription, ind) => <li key={ind} className={styles.HistoryItem}>
-                <h4>{his.param1}</h4>
-                <h4>{his.operator}</h4>
-                <h4>{his.param2}</h4>
-                <h4>=</h4>
-                <h4 style={{ minWidth: "50%" }}>{his.answer}</h4>
-              </li>)}
+            <ul className={classNames(styles.History, styles["list-group"])}>
+              {
+                !(history?.length > 0) &&
+                <li className={classNames(styles["list-group-item"], styles["text-center"])}>There is nothing here yet.</li>
+              }
+              {
+                history?.map((his: IOperationDescription, ind) =>
+                  <li key={ind} className={classNames(styles["list-group-item"], styles.HistoryItem)}>
+                    <h4>{his.param1}</h4>
+                    <h4>{his.operator}</h4>
+                    <h4>{his.param2}</h4>
+                    <h4>=</h4>
+                    <h4 style={{ minWidth: "50%" }}>{his.answer}</h4>
+                  </li>)
+              }
             </ul>
           }
           {
@@ -105,7 +147,28 @@ function App() {
           }
         </div>
       </div>
-
+      <Modal cssModule={styles} centered isOpen={toggleClearHistoryModal} toggle={() => setToggleClearHistoryModal(!toggleClearHistoryModal)}>
+        <ModalHeader cssModule={styles}>
+          Clear History
+        </ModalHeader>
+        <ModalBody cssModule={styles}>
+          Once you clear the history, it cannot be undone.<br />
+          Do you still want to clear the history?
+        </ModalBody>
+        <ModalFooter cssModule={styles}>
+          <div className={classNames(styles.Controls, styles["btn-group"], styles["btn-group-sm"])} title={calcToggleTitle}>
+            <button className={classNames(styles.btn, styles["btn-danger"], styles["btn-sm"])} onClick={() => {
+              clearHistory().then(() => setToggleClearHistoryModal(false));
+            }}> Yes
+            </button>
+            <button className={classNames(styles.btn, styles["btn-success"], styles["btn-sm"])} onClick={() => {
+              setToggleClearHistoryModal(false);
+            }}>
+              No
+            </button>
+          </div>
+        </ModalFooter>
+      </Modal>
     </div>
   )
 }

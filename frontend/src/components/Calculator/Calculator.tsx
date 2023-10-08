@@ -2,6 +2,7 @@ import classnames from "classnames"
 import styles from './Calculator.module.scss'
 import React, { useEffect, useState } from "react";
 import { operations, operationsInverse } from "../../util/constants";
+import { BsFillCalculatorFill } from "react-icons/bs";
 
 export interface ICalculatorParam {
   className?: string;
@@ -19,7 +20,7 @@ export interface ICalculatorParam {
 }
 const Calculator = (({ className, onCompute, param1: input1, param2: input2, operator: func, answer: result, loading }: ICalculatorParam) => {
 
-  const numbers = [1,2,3,4,5,6,7,8,9,0];
+  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 
   const [param1, setParam1] = useState<string | undefined>(input1);
   const [param2, setParam2] = useState<string | undefined>(input2);
@@ -31,8 +32,12 @@ const Calculator = (({ className, onCompute, param1: input1, param2: input2, ope
   const [cleanOnNextOperation, setClearOnNextOperation] = useState<boolean>(false);
 
   useEffect(() => {
+    if (operator != undefined) {
+      setOperatorLabel(operationsInverse[operator])
+    }
+
     // send request to the server if all parameters and operator is set
-    if (param1 && param2 && operator && runComputation) {
+    if (param1 != undefined && param2 != undefined && operator != undefined && runComputation) {
       setAnswer(undefined);
       if (typeof onCompute === "function") {
         onCompute(param1, param2, operator);
@@ -96,7 +101,14 @@ const Calculator = (({ className, onCompute, param1: input1, param2: input2, ope
 
               // process sign change
               if (label == "+/-") {
-                if (param?.startsWith("-")) newValue = param.substring(1); else newValue = `-${param}`
+                if (param == undefined && answer != undefined) {
+                  param = answer;
+                  setAnswer(undefined)
+                }
+
+                if (param?.startsWith("-")) newValue = param.substring(1);
+                else if (param != undefined) newValue = `-${param}`;
+
               }
 
               // otherwise, simply concatenate the number
@@ -109,48 +121,43 @@ const Calculator = (({ className, onCompute, param1: input1, param2: input2, ope
           }
           {
             Object.keys(operations).map((label: string, index) => <button key={index} className={styles.Button} disabled={param1 == undefined || loading} onClick={() => {
-              let target = targetParam;
-              let p1 = param1;
-              let p2 = param2;
 
-              if (p1 != undefined && p2 != undefined) {
+              setOperator(operations[label]);
+
+              // move the current asnwer into parameter 1
+              if (answer != undefined && !isNaN(Number(answer))) {
+                setOperator(operations[label]);
+                setTargetParam(1);
+                setParam1(answer);
+                setParam2(undefined);
+                setAnswer(undefined);
+                setClearOnNextOperation(false);
+                setRunComputation(false);
+                return;
+              }
+
+              // if the answer has not been set, run the calculation
+              if (param1 != undefined && param2 != undefined && answer == undefined) {
                 setRunComputation(true);
                 return;
               }
 
-              if (cleanOnNextOperation) {
-                p1 = result;
-                p2 = undefined;
-                target = 1;
-                setParam1(result);
-                setParam2(undefined);
-                setAnswer(undefined)
-                setClearOnNextOperation(false);
-                setTargetParam(1);
-              }
-
-              setOperator(operations[label]);
-              setOperatorLabel(label);
               // if we are on the first operand, reformat the number and switch to the second operand
-              if (target == 0 && p1 != undefined) {
-                !isNaN(Number(p1)) && setParam1(Number(p1).toString())
+              if (targetParam == 0 && param1 != undefined) {
+                !isNaN(Number(param1)) && setParam1(Number(param1).toString())
                 setTargetParam(1);
-              }
-
-              // if we are on the second operand send both operands to the server
-              else {
-                setTargetParam(0);
-                !isNaN(Number(p2)) && setParam2(Number(p2).toString())
-                p2 != undefined && setRunComputation(true);
               }
             }}>{label}</button>)
           }
-          <button className={styles.Button} disabled={param1 == undefined || param2 == undefined || operator == undefined || loading} onClick={() => {
-            setRunComputation(true)
-          }}>=</button>
+          <button className={styles.Button} disabled={param1 == undefined || param2 == undefined || operator == undefined || answer != undefined || loading} onClick={() => {
+            // If the answer has not been provided
+            if (answer == undefined) setRunComputation(true);
+          }}>
+            <BsFillCalculatorFill size="20" />
+          </button>
           <button className={styles.Button} disabled={loading} onClick={() => {
             clearAll();
-          }}>C</button>
+          }}>CA</button>
         </>
       </div>
     </div>
