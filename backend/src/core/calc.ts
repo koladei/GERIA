@@ -62,7 +62,7 @@ export const divide = (param1: number, params: number[]) => {
     return acc;
   }, param1);
 
-  if (dividedByZero) throw Error("Divide by zero is not allowed.");
+  if (dividedByZero) return "E";
 
   return result;
 };

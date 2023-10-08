@@ -5,7 +5,7 @@ const calcSchema = new Schema(
     param1: { type: Number, require: true },
     param2: { type: Number, require: true },
     operator: { type: String, require: true },
-    answer: { type: Number, require: true },
+    answer: { type: String, require: true },
   },
   { timestamps: true }
 );

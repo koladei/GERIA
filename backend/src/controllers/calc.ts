@@ -21,7 +21,7 @@ export const runCalc: RequestHandler<{ operator: string }, unknown, IOperationPa
     // run the calculation
     const operator = req.params.operator;
     const { param1, param2, ...paramX } = req.body;
-    let answer = 0;
+    let answer: string | number = 0;
 
     switch (operator) {
       case "sum":
@@ -58,7 +58,7 @@ export const runCalc: RequestHandler<{ operator: string }, unknown, IOperationPa
     });
 
     // return the result and history to the client
-    const history = await CalcModel.find().exec();
+    const history = await CalcModel.find().sort("-createdAt").limit(10).exec();
     res.status(201).json({
       calculation: calc,
       history,
