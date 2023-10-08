@@ -1,6 +1,7 @@
 import classnames from "classnames"
 import styles from './Calculator.module.scss'
 import React, { useEffect, useState } from "react";
+import { operations, operationsInverse } from "../../util/constants";
 
 export interface ICalculatorParam {
   className?: string;
@@ -18,17 +19,7 @@ export interface ICalculatorParam {
 }
 const Calculator = (({ className, onCompute, param1: input1, param2: input2, operator: func, answer: result, loading }: ICalculatorParam) => {
 
-  const numbers = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0];
-  const operations: { [name: string]: string } = {
-    "+": "add",
-    "-": "subtract",
-    "*": "multiply",
-    "/": "divide"
-  }
-  const operationsInverse: { [name: string]: string } = Object.keys(operations).reduce((all: { [name: string]: string }, cur) => {
-    all[operations[cur]] = cur;
-    return all;
-  }, {})
+  const numbers = [1,2,3,4,5,6,7,8,9,0];
 
   const [param1, setParam1] = useState<string | undefined>(input1);
   const [param2, setParam2] = useState<string | undefined>(input2);
