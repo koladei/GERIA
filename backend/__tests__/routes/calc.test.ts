@@ -84,7 +84,7 @@ describe("API routes", () => {
   it("~/api/calc/run/add return the correct sum and save the history", async () => {
     const operation = {
       param1: 8,
-      param2: 8,
+      param2: 7
     };
     const res = await request(app).post("/api/calc/run/add").send(operation);
 
@@ -92,7 +92,7 @@ describe("API routes", () => {
     expect(res.status).toBeLessThanOrEqual(299);
 
     const { answer }: { answer: number } = res.body.calculation;
-    expect(answer).toEqual("16");
+    expect(answer).toEqual("15");
 
     expect((await Calc.find()).length).toEqual(11);
   });

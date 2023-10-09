@@ -7,6 +7,7 @@ export const sum = (params: number[]) => {
   if (!params || params?.length < 2) throw Error("Please provide, at least, 2 numbers to summed-up");
 
   return params?.reduce((acc, cur) => {
+    if (isNaN(Number(cur))) return acc;
     acc += cur;
     return acc;
   }, 0);
@@ -22,6 +23,7 @@ export const subtract = (param1: number, params: number[]) => {
   if (!params || params?.length < 1) throw Error("Please provide the numbers to subtract");
 
   return params?.reduce((acc, cur) => {
+    if (isNaN(Number(cur))) return acc;
     acc -= cur;
     return acc;
   }, param1);
@@ -37,6 +39,7 @@ export const multiply = (params: number[]) => {
   if (!params || params?.length < 2) throw Error("Please provide, at least, 2 numbers to be multiplied");
 
   return params?.reduce((acc, cur) => {
+    if (isNaN(Number(cur))) return acc;
     acc *= cur;
     return acc;
   }, 1);
@@ -53,6 +56,7 @@ export const divide = (param1: number, params: number[]) => {
   let dividedByZero = false;
 
   const result = params?.reduce((acc, cur) => {
+    if (isNaN(Number(cur))) return acc;
     if (cur == 0) {
       dividedByZero = true;
       return acc;
