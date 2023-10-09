@@ -21,6 +21,7 @@ Knowing that it is best practice to exclude connection string, encryption keys a
 - The user is able to clear the history of calculations by clicking on the bin brush icon.
 
 ## HOW TO EXECUTE
+It should be noted that the this code was written and tested with node 18.15. It has not been tested with other versions of node.
 To start the application in development mode:
 1. Navigate to ~/backend and execute ```npm install``` to install all necessary modules.
 2. Navigate to ~/frontend and execute ```npm install``` to install all necessary modules likewize.
