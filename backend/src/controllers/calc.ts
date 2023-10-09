@@ -1,10 +1,10 @@
 import { Request, RequestHandler, Response } from "express";
-import CalcModel from "../models/calc";
 import { divide, multiply, subtract, sum } from "../core/calc";
+import Calc from "../models/Calc";
 
 export const getHistory: RequestHandler = async (req, res, next) => {
   try {
-    const history = await CalcModel.find().exec();
+    const history = await Calc.find().exec();
     res.status(200).json(history);
   } catch (error) {
     next(error);
@@ -13,7 +13,7 @@ export const getHistory: RequestHandler = async (req, res, next) => {
 
 export const clearHistory: RequestHandler = async (req, res, next) => {
   try {
-    const result = await CalcModel.deleteMany().exec();
+    const result = await Calc.deleteMany().exec();
     res.status(200).json({ result, history: [] });
   } catch (error) {
     next(error);
@@ -59,7 +59,7 @@ export const runCalc: RequestHandler<{ operator: string }, unknown, IOperationPa
     }
 
     // save the result to the database
-    const calc = await CalcModel.create({
+    const calc = await Calc.create({
       param1,
       param2,
       operator,
@@ -67,7 +67,7 @@ export const runCalc: RequestHandler<{ operator: string }, unknown, IOperationPa
     });
 
     // return the result and history to the client
-    const history = await CalcModel.find().sort("-createdAt").limit(10).exec();
+    const history = await Calc.find().sort("-createdAt").limit(10).exec();
     res.status(201).json({
       calculation: calc,
       history,

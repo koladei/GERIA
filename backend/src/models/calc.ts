@@ -1,4 +1,4 @@
-import { InferSchemaType, Schema, model } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 const calcSchema = new Schema(
   {
@@ -10,6 +10,6 @@ const calcSchema = new Schema(
   { timestamps: true }
 );
 
-type Calc = InferSchemaType<typeof calcSchema>;
+export default models["Calc"] || model("Calc", calcSchema);
 
-export default model<Calc>("Calc", calcSchema);
+// type CalcType = InferSchemaType<typeof Calc.schema>;
