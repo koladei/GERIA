@@ -95,11 +95,11 @@ function App() {
               {
                 history?.map((his: IOperationDescription, ind) =>
                   <li key={ind} className={classNames(styles["list-group-item"], styles.HistoryItem)}>
-                    <h4>{his.param1}</h4>
-                    <h4>{his.operator}</h4>
-                    <h4>{his.param2}</h4>
-                    <h4>=</h4>
-                    <h4 style={{ minWidth: "50%" }}>{his.answer}</h4>
+                    <span>{his.param1}</span>
+                    <span>{his.operator}</span>
+                    <span>{his.param2}</span>
+                    <span>=</span>
+                    <span style={{ minWidth: "50%" }}>{his.answer}</span>
                   </li>)
               }
             </ul>
