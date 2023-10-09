@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect } from "@jest/globals";
 import request from "supertest";
 import app from "../../src/server";
 import Calc from "../../src/models/Calc";
@@ -64,11 +64,11 @@ afterAll(async () => {
 });
 
 describe("API routes", () => {
-  test("~/api/calc/<invalid-route> should return 'not found' for invalid routes", async () => {
+  it("~/api/calc/<invalid-route> should return 'not found' for invalid routes", async () => {
     request(app).get("/api/cada").expect(404, {
       error: "Not Found",
     });
-  });
+  }, 3000);
 
   it("~/api/calc/history should return all calculations history items.", async () => {
     const items = await Calc.find();
