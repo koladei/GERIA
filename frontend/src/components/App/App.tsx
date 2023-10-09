@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
-import styles from './App.module.scss'
-import Calculator from '../Calculator/Calculator';
+import { useEffect, useState } from 'react';
+import styles from './App.module.scss';
 import { IOperationDescription } from '../../models/interfaces';
 import { Modal, ModalBody, ModalHeader, ModalFooter } from "reactstrap";
 import { BsClockHistory, BsFillCalculatorFill } from "react-icons/bs";
 import { AiOutlineClear } from "react-icons/ai"
 import { operationsInverse } from '../../util/constants';
 import classNames from 'classnames';
+import Calculator from '../Calculator/Calculator';
 
 function App() {
   const [showHistory, setShowHistory] = useState(false);
@@ -15,6 +15,7 @@ function App() {
   const [currentOperation, setCurrentOperation] = useState<IOperationDescription>({});
   const [calcToggleTitle, setCalcToggleTitle] = useState("");
   const [toggleClearHistoryModal, setToggleClearHistoryModal] = useState(false);
+  const host = `${process?.env?.HOST || ""}${process?.env?.HOST && ":"}${process?.env?.PORT}`;
 
   useEffect(() => {
     if (showHistory) setCalcToggleTitle("Click to return to calculator");
@@ -24,7 +25,7 @@ function App() {
   useEffect(() => {
     const getHistory = async () => {
 
-      const f = await fetch("/api/calc/history");
+      const f = await fetch(`${host}/api/calc/history`);
       return await f.json();
     }
 
@@ -44,7 +45,7 @@ function App() {
   }
 
   const clearHistory = async () => {
-    const f = await fetch("/api/calc/history/clear");
+    const f = await fetch(`${host}/api/calc/history/clear`);
     const deleteOps = await f.json();
 
     setHistory(mapHistory(deleteOps.history));
@@ -55,12 +56,12 @@ function App() {
       <div className={styles.Content}>
         <div className={styles.Heading}>
           <div className={styles.Logo} style={{ backgroundImage: `url('logo.png')` }} />
-          <div className={styles.Title}>REST Calculator App</div>
+          <div id="app-title" className={styles.Title}>REST Calculator App</div>
         </div>
 
         {
           !showHistory && <div className={classNames(styles.Controls, styles["btn-group"])} title={calcToggleTitle} >
-            <button className={classNames(styles.btn, styles["btn-warning"], styles["btn-sm"])} onClick={() => {
+            <button className={classNames("history-toggle", styles.btn, styles["btn-warning"], styles["btn-sm"])} onClick={() => {
               setShowHistory(!showHistory);
             }}>
               <BsClockHistory size="20" />
@@ -77,7 +78,7 @@ function App() {
             }}>
               <AiOutlineClear size="20" />
             </button>
-            <button className={classNames(styles.btn, styles["btn-warning"], styles["btn-sm"])} onClick={() => {
+            <button className={classNames("calc-toggle", styles.btn, styles["btn-warning"], styles["btn-sm"])} onClick={() => {
               setShowHistory(!showHistory);
             }}>
               <BsFillCalculatorFill size="20" />
@@ -89,12 +90,16 @@ function App() {
             showHistory &&
             <ul className={classNames(styles.History, styles["list-group"])}>
               {
-                !(history?.length > 0) &&
-                <li className={classNames(styles["list-group-item"], styles["text-center"])}>There is nothing here yet.</li>
+                loading &&
+                <li className={classNames("loading-history-items", styles["list-group-item"], styles["text-center"])}>Loading...</li>
+              }
+              {
+                !(history?.length > 0) && !loading &&
+                <li className={classNames("no-history-item", styles["list-group-item"], styles["text-center"])}>There is nothing here yet.</li>
               }
               {
                 history?.map((his: IOperationDescription, ind) =>
-                  <li key={ind} className={classNames(styles["list-group-item"], styles.HistoryItem)}>
+                  <li key={ind} className={classNames("history-item", styles["list-group-item"], styles.HistoryItem)}>
                     <span>{his.param1}</span>
                     <span>{his.operator}</span>
                     <span>{his.param2}</span>
@@ -112,11 +117,11 @@ function App() {
               param2={currentOperation.param2}
               operator={currentOperation.operator}
               answer={currentOperation.answer}
-              className={styles.Calculator}
-              onCompute={(param1, param2, operator) => {
+              className={classNames("calculator", styles.Calculator)}
+              onCompute={(param1: string, param2: string, operator: string) => {
                 const getAnswer = async () => {
 
-                  const f = await fetch(`/api/calc/run/${operator}`, {
+                  const f = await fetch(`${host}/api/calc/run/${operator}`, {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",

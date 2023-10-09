@@ -3,6 +3,7 @@ import styles from './Calculator.module.scss'
 import React, { useEffect, useState } from "react";
 import { operations, operationsInverse } from "../../util/constants";
 import { BsFillCalculatorFill } from "react-icons/bs";
+import classNames from "classnames";
 
 export interface ICalculatorParam {
   className?: string;
@@ -66,7 +67,7 @@ const Calculator = (({ className, onCompute, param1: input1, param2: input2, ope
   }
   return (
     <div className={classnames(styles.Calculator, className)}>
-      <div className={styles.Screen}>
+      <div className={classNames("display", styles.Screen)}>
         <span>{param1 != undefined ? param1 : ""}</span>
         <span>{operatorLabel || ""}</span>
         <span>{param2 != undefined ? param2 : ""}</span>
