@@ -20,7 +20,7 @@ export const clearHistory: RequestHandler = async (req, res, next) => {
   }
 };
 
-interface IOperationParameters {
+export interface IOperationParameters {
   param1: number;
   param2: number;
   [paramX: string]: number;

@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-    "test": "DOTENV_CONFIG_PATH=.env.test jest --coverage",
+    "test": "DOTENV_CONFIG_PATH=.env.test jest --coverage --runInBand",
     "lint": "eslint . --ext .ts",
     "start": "tsc && node dist/server.js",
     "watch-and-run": "ts-node-dev --respawn -- src/server.ts"

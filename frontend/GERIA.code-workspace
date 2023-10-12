@@ -14,7 +14,9 @@
 	],
 	"settings": {
 		"jest.disabledWorkspaceFolders": [
-			"GERIA"
+			"GERIA",
+			"backend",
+			"frontend"
 		]
 	}
 }

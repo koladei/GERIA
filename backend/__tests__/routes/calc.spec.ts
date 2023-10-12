@@ -1,7 +1,9 @@
-import { describe, expect } from "@jest/globals";
 import request from "supertest";
-import app from "../../src/server";
+import app from "../../src/app";
 import Calc from "../../src/models/Calc";
+import { connect, disconnect } from "../../__helper__/mongodb.memory.test.helper";
+
+beforeAll(connect);
 
 beforeEach(async () => {
   await Calc.deleteMany();
@@ -57,15 +59,14 @@ beforeEach(async () => {
       answer: 3,
     }
   );
-}, 20000);
-
-afterAll(async () => {
-  await Calc.deleteMany();
 });
+
+
+afterAll(disconnect);
 
 describe("API routes", () => {
   it("~/api/calc/<invalid-route> should return 'not found' for invalid routes", async () => {
-    request(app).get("/api/cada").expect(404, {
+    request(app).get("/api/cada").timeout(10000).expect(404, {
       error: "Not Found",
     });
   }, 3000);
@@ -81,7 +82,7 @@ describe("API routes", () => {
     request(app).get("/api/calc/history").expect(200, []);
   }, 10000);
 
-  it("~/api/calc/run/add return the correct sum and save the history", async () => {
+  it("~/api/calc/run/add should return the correct sum and save the history", async () => {
     const operation = {
       param1: 8,
       param2: 7,
@@ -97,12 +98,12 @@ describe("API routes", () => {
     expect((await Calc.find()).length).toEqual(11);
   }, 10000);
 
-  it("~/api/calc/run/sub return the correct difference and save the history", async () => {
+  it("~/api/calc/run/sub should return the correct difference and save the history", async () => {
     const operation = {
       param1: 8,
       param2: 18,
     };
-    const res = await request(app).post("/api/calc/run/sub").send(operation);
+    const res = await request(app).post("/api/calc/run/sub").timeout(10000).send(operation);
 
     expect(res.status).toBeGreaterThanOrEqual(200);
     expect(res.status).toBeLessThanOrEqual(299);
@@ -113,12 +114,12 @@ describe("API routes", () => {
     expect((await Calc.find()).length).toEqual(11);
   }, 10000);
 
-  it("~/api/calc/run/mul return the correct multiplication and save the history", async () => {
+  it("~/api/calc/run/mul should return the correct multiplication and save the history", async () => {
     const operation = {
       param1: 8,
       param2: 100,
     };
-    const res = await request(app).post("/api/calc/run/mul").send(operation);
+    const res = await request(app).post("/api/calc/run/mul").timeout(10000).send(operation);
 
     expect(res.status).toBeGreaterThanOrEqual(200);
     expect(res.status).toBeLessThanOrEqual(299);
@@ -129,12 +130,12 @@ describe("API routes", () => {
     expect((await Calc.find()).length).toEqual(11);
   }, 10000);
 
-  it("~/api/calc/run/div return the correct division and save the history", async () => {
+  it("~/api/calc/run/div should return the correct division and save the history", async () => {
     const operation = {
       param1: 10000,
       param2: 0,
     };
-    const res = await request(app).post("/api/calc/run/div").send(operation);
+    const res = await request(app).post("/api/calc/run/div").timeout(10000).send(operation);
 
     expect(res.status).toBeGreaterThanOrEqual(200);
     expect(res.status).toBeLessThanOrEqual(299);
@@ -148,7 +149,7 @@ describe("API routes", () => {
       param1: 10000,
       param2: 100000,
     };
-    const res2 = await request(app).post("/api/calc/run/div").send(operation2);
+    const res2 = await request(app).post("/api/calc/run/div").timeout(10000).send(operation2);
 
     expect(res2.status).toBeGreaterThanOrEqual(200);
     expect(res2.status).toBeLessThanOrEqual(299);

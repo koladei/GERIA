@@ -19,6 +19,10 @@ mongoose
       app.listen(env.PORT, () => {
         console.log("Server running on port %d", env.PORT);
       });
+
+      app.on("close", async () => {
+        await mongoose.connection.close();
+      });
     }
   })
   .catch(console.error);
